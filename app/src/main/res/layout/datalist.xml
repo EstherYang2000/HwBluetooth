@@ -1,48 +1,35 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:padding="16dp">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
         <TextView
             android:id="@+id/mac1"
-            style="@style/TextAppearance.AppCompat.Title"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="monospace"
-            tools:text="mac" />
-
+            android:layout_marginRight="10px"
+            android:text="TextView"
+            android:textSize="16sp"/>
         <TextView
             android:id="@+id/rssi1"
-            style="@style/TextAppearance.AppCompat.Title"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="monospace"
-            tools:text="rssi"
-            />
-
+            android:layout_marginRight="10px"
+            android:text="TextView"
+            android:textSize="16sp"/>
         <TextView
-            android:id="@+id/content1"
-            style="@style/TextAppearance.AppCompat.Title"
-            android:layout_width="match_parent"
+            android:id="@+id/content"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="content"
-            />
-
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/data"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Button"
-        android:layout_gravity="end"/>
+            android:text="TextView"
+            android:textSize="16sp"/>
+        <Button
+            android:id="@+id/data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Detail" />
 
 
-</FrameLayout>
+</LinearLayout>

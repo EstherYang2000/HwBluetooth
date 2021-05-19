@@ -28,6 +28,10 @@ public class DataFragment extends Fragment {
     private TextView tv_detail_content;
     private Button BackScan;
 
+
+    public DataFragment() {
+        // Required empty public constructor
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

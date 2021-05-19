@@ -10,7 +10,6 @@ import android.bluetooth.le.ScanResult;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -27,11 +26,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 import java.util.HashMap;
-
-import static androidx.navigation.Navigation.*;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -45,7 +41,7 @@ public class ScanFragment extends Fragment implements RecyclerAdapter.onButtonCl
     private Button ScanData;
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothLeScanner mBluetoothLeScanner;
-    private HashMap<String, BLEdevice> BluetoothHashMap;
+    private HashMap<String, BLEdevice> BluetoothHashMap= new HashMap<>();
     private RecyclerAdapter mResultAdapter;
     private Button buttonSCAN;
     private Button Scandata;
@@ -53,85 +49,45 @@ public class ScanFragment extends Fragment implements RecyclerAdapter.onButtonCl
     private boolean isScanning=false;
     private View view;
 
-
-    public ScanFragment() {
-        // Required empty public constructor
-    }
-
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
+    final String permissions[] = {
+            Manifest.permission.BLUETOOTH,
+            Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_scan, container, false);
-        buttonSCAN = (Button) rootView.findViewById(R.id.buttonSCAN);
-        Scandata=(Button)rootView.findViewById(R.id.data);
-        mRecyclerView=(RecyclerView)rootView.findViewById(R.id.bthdata);
-        mResultAdapter=new RecyclerAdapter(BluetoothHashMap,this);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        LinearLayoutManager layoutManager=new LinearLayoutManager(getActivity());
-        mRecyclerView.setLayoutManager(layoutManager);
         // Inflate the layout for this fragment
-        return rootView;
+        view = inflater.inflate(R.layout.fragment_scan, container, false);
+
+        // Initialize View
+        buttonSCAN = view.findViewById(R.id.buttonSCAN);
+        mRecyclerView = view.findViewById(R.id.bthdata);
+
+        // Initialize RecyclerView
+        mResultAdapter = new RecyclerAdapter(BluetoothHashMap, this);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setAdapter(mResultAdapter);
+
+        return view;
     }
 
-
-
-    private static final int Permission_Code=666;
-
-    private final static String[]permissionWeNeed=new String[]{
-            Manifest.permission.BLUETOOTH,
-            Manifest.permission.BLUETOOTH_ADMIN,
-            Manifest.permission.ACCESS_BACKGROUND_LOCATION};
-
-    private void setupPermission(){
-
-        boolean isaccpeted=true;
-        for(String permission:permissionWeNeed){
-            isaccpeted&= ActivityCompat.checkSelfPermission(getContext(),permission)== PackageManager.PERMISSION_GRANTED;
-        }
-
-
-        if(!isaccpeted){
-            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
-                requestPermissions(permissionWeNeed,Permission_Code);
-            }else{
-                Toast.makeText(getActivity(),"no permission",Toast.LENGTH_SHORT);
-
-            }
-        }else{
-            initBlutooth();
-        }
-
-    }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onViewCreated(@NonNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        switch(requestCode){
-            case Permission_Code:{
-                boolean isaccpeted=true;
-                for(String permission:permissionWeNeed){
-                    isaccpeted&= ActivityCompat.checkSelfPermission(getContext(),permission)== PackageManager.PERMISSION_GRANTED;
-                }
+        boolean isGranted = isGranted(getActivity(), permissions);
 
-
-                if(!isaccpeted){
-                    initBlutooth();
-                }else{
-                    Toast.makeText(getActivity(),"no permission",Toast.LENGTH_SHORT).show();
-                }
-            }
+        if (!isGranted) {
+            // Access Permissions Dynamically
+            ActivityCompat.requestPermissions(getActivity(), permissions, 1);
         }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
 
-    private void initBlutooth(){
-        boolean success=false;
+
+        // Initialize Bluetooth Adapter
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // If Bluetooth not open or not enabled, request bluetooth action
@@ -143,81 +99,8 @@ public class ScanFragment extends Fragment implements RecyclerAdapter.onButtonCl
             mBluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
             Log.e("onViewCreated: ", "Bluetooth Adapter Not NULL");
         }
-//        if(bluetoothAdapter!=null&&bluetoothAdapter.isEnabled()){
-//            BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-//
-//            if(mBluetoothAdapter!=null)
-//                mBluetoothLeScanner =mBluetoothAdapter.getBluetoothLeScanner();
-//            Toast.makeText(getActivity(),"Bluetooth scan started",Toast.LENGTH_SHORT).show();
-//            success=true;
-//            Intent enableBlutoothIntent=new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-//            startActivity(enableBlutoothIntent);
-//
-//
-//        }
-//        if(!success) {
-////            mBluetoothLeScanner=bluetoothAdapter.getBluetoothLeScanner();
-//            Toast.makeText(getActivity(),"Bluetooth scan cannot be turned off.",Toast.LENGTH_SHORT).show();
-//            Intent enableBlutoothIntent=new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-//            startActivity(enableBlutoothIntent);
-////            finishAndRemoveTask();
-//
-//        }
-    }
 
-    private final ScanCallback startScanCallback = new ScanCallback() {
 
-        @Override
-        public void onScanResult(int callbackType, ScanResult result) {
-
-            BluetoothDevice device = result.getDevice();
-            ScanRecord mScanRecord = result.getScanRecord();
-            String address = device.getAddress();
-            byte[] content = mScanRecord.getBytes();
-            int mRssi = result.getRssi();
-            String mRssi1=Integer.toString(mRssi);
-            String ContentMessage=ByteArrayToHexString(content);
-            if(address==null||address.trim().length()==0){
-
-                BluetoothHashMap.put(address,new BLEdevice(ContentMessage,mRssi1));
-                //public void addbth(String mac,String rssi, String content)
-                mResultAdapter.notifyDataSetChanged();
-
-            }
-        }
-
-    };
-
-    public static String ByteArrayToHexString(byte[] bytes) {
-        final char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
-        char[] hexChars = new char[bytes.length * 2]; // Each byte has two hex characters (nibbles)
-        int v;
-        for (int j = 0; j < bytes.length; j++) {
-            v = bytes[j] & 0xFF; // Cast bytes[j] to int, treating as unsigned value
-            hexChars[j * 2] = hexArray[v >>> 4]; // Select hex character from upper nibble
-            hexChars[j * 2 + 1] = hexArray[v & 0x0F]; // Select hex character from lower nibble
-        }
-        return new String(hexChars);
-    }
-
-    public void startScan(){
-        isScanning=true;
-        Log.d("onClicked","start to scan");
-        buttonSCAN.setText("SCAN OFF");
-        mBluetoothLeScanner.startScan(startScanCallback);
-    }
-    public void stopScan(){
-        isScanning=false;
-        Log.d("onClicked","stop to scan");
-        buttonSCAN.setText("SCAN ON");
-        mBluetoothLeScanner.stopScan(startScanCallback);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        setupPermission();
         // Start or Stop Scanning
         buttonSCAN.setOnClickListener(new View.OnClickListener() {
 
@@ -231,33 +114,90 @@ public class ScanFragment extends Fragment implements RecyclerAdapter.onButtonCl
                 }
             }
         });
-
-
-//        NavController navController= Navigation.findNavController(view);
-//        Button Data=view.findViewById(R.id.data);
-//        Data.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                navController.navigate(R.id.action_scanFragment_to_dataFragment);
-//            }
-//        });
-
     }
 
     @Override
-    public void onButtonClick(String key, BLEdevice blEdevice) {
+    public void onPause() {
+        super.onPause();
+        stopScan();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        stopScan();
+    }
+
+    private final ScanCallback startScanCallback = new ScanCallback() {
+        @Override
+        public void onScanResult(int callbackType, ScanResult result) {
+            BluetoothDevice device = result.getDevice();
+            ScanRecord mScanRecord = result.getScanRecord();
+            String address = device.getAddress();
+            byte[] content = mScanRecord.getBytes();
+            int mRssi = result.getRssi();
+
+            String contentMessage = convertContent(content);
+
+            // Use Hashmap to ensure mac address unique
+            BluetoothHashMap.put(address, new BLEdevice(contentMessage, String.valueOf(mRssi)));
+            // Update Adapter with notifyDataSetChanged()
+            mResultAdapter.notifyDataSetChanged();
+        }
+    };
+
+    // Implementation of Interface OnButtonClickHandler.onButtonClick()
+
+
+    @Override
+    public void onButtonClick(String key, BLEdevice bluetoothLE) {
+
+        stopScan();
+
         NavController navController = Navigation.findNavController(this.view);
 
         // Implementation of Safe Arguments
-
         ScanFragmentDirections.ActionScanFragmentToDataFragment action =
                 ScanFragmentDirections.actionScanFragmentToDataFragment("MAC: " + key
-                        , "RSSI: " + blEdevice.getRssi()
-                        , blEdevice.getContent());
+                        , "RSSI: " + bluetoothLE.getRSSI()
+                        , bluetoothLE.getContent());
 
         // Navigating to specific fragment
         navController.navigate(action);
+    }
 
+    public boolean isGranted(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public void startScan() {
+        isScanning = true;
+        Log.d("onClicked", "start to scan");
+        buttonSCAN.setText("Stop");
+        mBluetoothLeScanner.startScan(startScanCallback);
+    }
+
+    public void stopScan() {
+        isScanning = false;
+        Log.d("onClicked", "stop to scan");
+        buttonSCAN.setText("Scan");
+        mBluetoothLeScanner.stopScan(startScanCallback);
+    }
+
+    public String convertContent(byte[] content) {
+        String message = "";
+        for (byte b : content) {
+            message += String.format("%02x ", b);
+        }
+        return message;
     }
 
 

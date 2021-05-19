@@ -1,8 +1,8 @@
 package com.example.hwbluetooth;
 
 public class BLEdevice {
-    public String RSSI;
-    public String content;
+    private String RSSI;
+    private String content;
 
     public BLEdevice(String content,String RSSI) {
 //        this.devicemac = devicemac;
@@ -34,9 +34,7 @@ public class BLEdevice {
         return content;
     }
 
-    public String getRssi() {
-        return RSSI;
-    }
+
 
 
 }

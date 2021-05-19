@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Text;
 
 import java.util.HashMap;
@@ -20,6 +21,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     interface onButtonClickHandler {
         // 提供onItemClick方法作為點擊事件，括號內為接受的參數
         void onButtonClick(String key,BLEdevice blEdevice);
+
+        // Implementation of Interface OnButtonClickHandler.onButtonClick()
         // 提供onItemRemove做為移除項目的事件
     }
 
@@ -39,21 +42,23 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
     @NonNull
     @Override
-    public RecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        Context context = viewGroup.getContext();
-        int layoutIdForListItem = R.layout.datalist;
-        LayoutInflater inflater = LayoutInflater.from(context);
-        boolean shouldAttachToParentImmediately = false;
-
-        View view1 = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
-
-
-        return new ViewHolder(view1);
+    public RecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.datalist, parent, false);
+        return new ViewHolder(view);
+//        Context context = viewGroup.getContext();
+//        int layoutIdForListItem = R.layout.datalist;
+//        LayoutInflater inflater = LayoutInflater.from(context);
+//        boolean shouldAttachToParentImmediately = false;
+//
+//        View view1 = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
+//
+//
+//        return new ViewHolder(view1);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.getDevicemac().setOnClickListener(holder);
+    public void onBindViewHolder(@NonNull @NotNull ViewHolder holder, int position) {
+        holder.getBtn_detail().setOnClickListener(holder);
         String key=getKeyInHashMap(hashMap,position);
         BLEdevice value=getValueInHashMap(hashMap,position);
         holder.getDevicemac().setText(key);

@@ -7,34 +7,22 @@
     android:orientation="vertical">
 
 
-
-    <ScrollView
-        android:id="@+id/scrollView1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true" >
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/bthdata"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:layout_editor_absoluteX="-189dp"
-            tools:layout_editor_absoluteY="16dp" />
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"/>
 
-
-    </ScrollView>
 
 
     <Button
-        android:id="@+id/buttonSCAN"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:text="SCAN ON"
-        />
+    android:id="@+id/buttonSCAN"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:layout_gravity="bottom"
+    android:text="SCAN"
+    android:layout_marginTop="10dp"/>
 
 
 </FrameLayout>
