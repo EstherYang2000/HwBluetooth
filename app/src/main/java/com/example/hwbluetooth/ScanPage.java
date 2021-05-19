@@ -11,6 +11,8 @@ public class ScanPage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intentThatStartedThisActivity = getIntent();
-        setContentView(R.layout.fragment_scan);
+        setContentView(R.layout.activity_scan_page);
+
+
     }
 }

@@ -37,18 +37,18 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
 
 
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+    public RecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         Context context = viewGroup.getContext();
         int layoutIdForListItem = R.layout.datalist;
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
 
         View view1 = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
-        ViewHolder viewHolder = new ViewHolder(view1);
 
 
-        return viewHolder;
+        return new ViewHolder(view1);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return 0;
+        return hashMap.size();
     }
 
     private String getKeyInHashMap(HashMap<String, BLEdevice> hashMap, int position) {
@@ -112,16 +112,16 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             BLEdevice value=getValueInHashMap(hashMap,wrapperPosition);
             mButtonClickHandler.onButtonClick(key,value);
         }
-        private TextView  getDevicemac() {
+        public TextView  getDevicemac() {
             return deviceNameView;
         }
 
-        private TextView getDeviceRssi() {
+        public TextView getDeviceRssi() {
             return RssiView;
 
         }
 
-        private Button getBtn_detail() {
+        public Button getBtn_detail() {
             return DataButton ;
         }
     }

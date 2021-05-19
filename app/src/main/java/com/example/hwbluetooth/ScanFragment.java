@@ -7,6 +7,7 @@ import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanRecord;
 import android.bluetooth.le.ScanResult;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -50,6 +51,7 @@ public class ScanFragment extends Fragment implements RecyclerAdapter.onButtonCl
     private Button Scandata;
     private RecyclerView mRecyclerView;
     private boolean isScanning=false;
+    private View view;
 
 
     public ScanFragment() {
@@ -60,7 +62,6 @@ public class ScanFragment extends Fragment implements RecyclerAdapter.onButtonCl
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setupPermission();
     }
 
     @Override
@@ -91,7 +92,7 @@ public class ScanFragment extends Fragment implements RecyclerAdapter.onButtonCl
 
         boolean isaccpeted=true;
         for(String permission:permissionWeNeed){
-            isaccpeted&= ActivityCompat.checkSelfPermission(getActivity(),permission)== PackageManager.PERMISSION_GRANTED;
+            isaccpeted&= ActivityCompat.checkSelfPermission(getContext(),permission)== PackageManager.PERMISSION_GRANTED;
         }
 
 
@@ -103,8 +104,8 @@ public class ScanFragment extends Fragment implements RecyclerAdapter.onButtonCl
 
             }
         }else{
+            initBlutooth();
         }
-        initBlutooth();
 
     }
 
@@ -115,20 +116,15 @@ public class ScanFragment extends Fragment implements RecyclerAdapter.onButtonCl
             case Permission_Code:{
                 boolean isaccpeted=true;
                 for(String permission:permissionWeNeed){
-                    isaccpeted&= ActivityCompat.checkSelfPermission(getActivity(),permission)== PackageManager.PERMISSION_GRANTED;
+                    isaccpeted&= ActivityCompat.checkSelfPermission(getContext(),permission)== PackageManager.PERMISSION_GRANTED;
                 }
 
 
                 if(!isaccpeted){
-                    if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
-                        requestPermissions(permissionWeNeed,Permission_Code);
-                    }else{
-                        Toast.makeText(getActivity(),"no permission",Toast.LENGTH_SHORT);
-
-                    }
-                }else{
                     initBlutooth();
-               }
+                }else{
+                    Toast.makeText(getActivity(),"no permission",Toast.LENGTH_SHORT).show();
+                }
             }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -136,26 +132,37 @@ public class ScanFragment extends Fragment implements RecyclerAdapter.onButtonCl
 
     private void initBlutooth(){
         boolean success=false;
-        if(bluetoothAdapter!=null&&bluetoothAdapter.isEnabled()){
-            BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-            if(mBluetoothAdapter!=null)
-                mBluetoothLeScanner =mBluetoothAdapter.getBluetoothLeScanner();
-            Toast.makeText(getActivity(),"Bluetooth scan started",Toast.LENGTH_SHORT).show();
-            success=true;
-            Intent enableBlutoothIntent=new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivity(enableBlutoothIntent);
-
-
+        // If Bluetooth not open or not enabled, request bluetooth action
+        if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
+            Intent enableBluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivity(enableBluetoothIntent);
         }
-        if(!success) {
-            mBluetoothLeScanner=bluetoothAdapter.getBluetoothLeScanner();
-            Toast.makeText(getActivity(),"Bluetooth scan cannot be turned off.",Toast.LENGTH_SHORT).show();
-            Intent enableBlutoothIntent=new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivity(enableBlutoothIntent);
-//            finishAndRemoveTask();
-
+        if (bluetoothAdapter != null) {
+            mBluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+            Log.e("onViewCreated: ", "Bluetooth Adapter Not NULL");
         }
+//        if(bluetoothAdapter!=null&&bluetoothAdapter.isEnabled()){
+//            BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+//
+//            if(mBluetoothAdapter!=null)
+//                mBluetoothLeScanner =mBluetoothAdapter.getBluetoothLeScanner();
+//            Toast.makeText(getActivity(),"Bluetooth scan started",Toast.LENGTH_SHORT).show();
+//            success=true;
+//            Intent enableBlutoothIntent=new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//            startActivity(enableBlutoothIntent);
+//
+//
+//        }
+//        if(!success) {
+////            mBluetoothLeScanner=bluetoothAdapter.getBluetoothLeScanner();
+//            Toast.makeText(getActivity(),"Bluetooth scan cannot be turned off.",Toast.LENGTH_SHORT).show();
+//            Intent enableBlutoothIntent=new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//            startActivity(enableBlutoothIntent);
+////            finishAndRemoveTask();
+//
+//        }
     }
 
     private final ScanCallback startScanCallback = new ScanCallback() {
@@ -175,10 +182,8 @@ public class ScanFragment extends Fragment implements RecyclerAdapter.onButtonCl
                 BluetoothHashMap.put(address,new BLEdevice(ContentMessage,mRssi1));
                 //public void addbth(String mac,String rssi, String content)
                 mResultAdapter.notifyDataSetChanged();
-                return;
+
             }
-
-
         }
 
     };
@@ -195,12 +200,12 @@ public class ScanFragment extends Fragment implements RecyclerAdapter.onButtonCl
         return new String(hexChars);
     }
 
-//    public void startScan(){
-//        isScanning=true;
-//        Log.d("onClicked","start to scan");
-//        buttonSCAN.setText("SCAN OFF");
-//        mBluetoothLeScanner.startScan(startScanCallback);
-//    }
+    public void startScan(){
+        isScanning=true;
+        Log.d("onClicked","start to scan");
+        buttonSCAN.setText("SCAN OFF");
+        mBluetoothLeScanner.startScan(startScanCallback);
+    }
     public void stopScan(){
         isScanning=false;
         Log.d("onClicked","stop to scan");
@@ -208,10 +213,26 @@ public class ScanFragment extends Fragment implements RecyclerAdapter.onButtonCl
         mBluetoothLeScanner.stopScan(startScanCallback);
     }
 
-//    @Override
-//    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-//        super.onViewCreated(view, savedInstanceState);
-//
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        setupPermission();
+        // Start or Stop Scanning
+        buttonSCAN.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if (isScanning) {
+                    stopScan();
+                }
+                else {
+                    startScan();
+                }
+            }
+        });
+
+
 //        NavController navController= Navigation.findNavController(view);
 //        Button Data=view.findViewById(R.id.data);
 //        Data.setOnClickListener(new View.OnClickListener() {
@@ -220,16 +241,24 @@ public class ScanFragment extends Fragment implements RecyclerAdapter.onButtonCl
 //                navController.navigate(R.id.action_scanFragment_to_dataFragment);
 //            }
 //        });
-//
-//    }
+
+    }
 
     @Override
     public void onButtonClick(String key, BLEdevice blEdevice) {
-        stopScan();
-//        Navigation navController=findNavController(this.view);
-//        ScanFragmentDirections.ActionScanFragmentToDataFragment action
-//                = ScanFragmentDirections.actionScanFragmentToDataFragment("MAC:"+key,"RSSI:"+blEdevice.getRSSI(),"Content:"+blEdevice.getContent());
-//        navController.navigate(action);
+        NavController navController = Navigation.findNavController(this.view);
+
+        // Implementation of Safe Arguments
+
+        ScanFragmentDirections.ActionScanFragmentToDataFragment action =
+                ScanFragmentDirections.actionScanFragmentToDataFragment("MAC: " + key
+                        , "RSSI: " + blEdevice.getRssi()
+                        , blEdevice.getContent());
+
+        // Navigating to specific fragment
+        navController.navigate(action);
 
     }
+
+
 }

@@ -33,4 +33,10 @@ public class BLEdevice {
     public String getContent() {
         return content;
     }
+
+    public String getRssi() {
+        return RSSI;
+    }
+
+
 }
