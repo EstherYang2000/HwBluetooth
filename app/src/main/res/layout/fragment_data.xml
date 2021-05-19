@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DataFragment"
+    android:orientation="vertical"
+    >
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <Button
+        android:id="@+id/BackScan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="BackScan" />
+    <TextView
+        android:id="@+id/MacData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="MAC:"
+        android:textSize="30dp"/>
+
+    <TextView
+        android:id="@+id/RssiData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="RssiData:"
+        android:textSize="30dp"/>
+    <TextView
+        android:id="@+id/ContentData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="ContentData:"
+        android:textSize="30dp"/>
+
+
+
+</LinearLayout>
