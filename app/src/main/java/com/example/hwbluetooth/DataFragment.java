@@ -23,14 +23,13 @@ public class DataFragment extends Fragment {
 
 
     private View rootView;
-    private TextView tv_detail_mac;
-    private TextView tv_detail_rssi;
-    private TextView tv_detail_content;
+    private TextView datamac;
+    private TextView datarssi;
+    private TextView datacontent;
     private Button BackScan;
 
 
     public DataFragment() {
-        // Required empty public constructor
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -38,32 +37,34 @@ public class DataFragment extends Fragment {
 
     }
 
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        DataFragmentArgs args = DataFragmentArgs.fromBundle(getArguments());
+        datamac.setText(args.getMac());
+        datarssi.setText(args.getRssi());
+        datacontent.setText(args.getContent());
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         rootView = inflater.inflate(R.layout.fragment_data, container, false);
-        NavController navController= Navigation.findNavController(rootView);
         Button BackScan=rootView.findViewById(R.id.BackScan);
+        datamac = rootView.findViewById(R.id.MacData);
+        datarssi = rootView.findViewById(R.id.RssiData);
+        datacontent = rootView.findViewById(R.id.ContentData);
         BackScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                NavController navController= Navigation.findNavController(rootView);
                 navController.navigate(R.id.action_dataFragment_to_scanFragment);
 
             }
         });
         return rootView;
-    }
-
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Safe Arguments Received
-        DataFragmentArgs args = DataFragmentArgs.fromBundle(getArguments());
-        tv_detail_mac.setText(args.getMac());
-        tv_detail_rssi.setText(args.getRssi());
-        tv_detail_content.setText(args.getContent());
     }
 
 

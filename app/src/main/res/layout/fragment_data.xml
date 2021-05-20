@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="MAC:"
-        android:textSize="30dp"/>
+        android:textSize="10dp"/>
 
     <TextView
         android:id="@+id/RssiData"
@@ -28,14 +28,14 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="RssiData:"
-        android:textSize="30dp"/>
+        android:textSize="10dp"/>
     <TextView
         android:id="@+id/ContentData"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="ContentData:"
-        android:textSize="30dp"/>
+        android:textSize="10dp"/>
 
 
 

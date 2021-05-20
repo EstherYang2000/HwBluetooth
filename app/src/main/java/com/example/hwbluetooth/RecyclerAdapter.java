@@ -1,6 +1,8 @@
 package com.example.hwbluetooth;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,11 +10,13 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,7 +24,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
     interface onButtonClickHandler {
         // 提供onItemClick方法作為點擊事件，括號內為接受的參數
-        void onButtonClick(String key,BLEdevice blEdevice);
+        void onButtonClick(String key,String rssi, String Content);
 
         // Implementation of Interface OnButtonClickHandler.onButtonClick()
         // 提供onItemRemove做為移除項目的事件
@@ -28,6 +32,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
     private HashMap<String, BLEdevice> hashMap;
     private onButtonClickHandler mButtonClickHandler;
+    private Button detail;
 
 
     public RecyclerAdapter(HashMap<String, BLEdevice> hashMap, onButtonClickHandler mButtonClickHandler) {
@@ -43,7 +48,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     @NonNull
     @Override
     public RecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.datalist, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.datalist, parent,false);
         return new ViewHolder(view);
 //        Context context = viewGroup.getContext();
 //        int layoutIdForListItem = R.layout.datalist;
@@ -63,6 +68,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         BLEdevice value=getValueInHashMap(hashMap,position);
         holder.getDevicemac().setText(key);
         holder.getDeviceRssi().setText(value.getRSSI());
+        holder.getDeviceContent().setText(value.getContent());
+
     }
 
 
@@ -115,7 +122,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             int wrapperPosition=getAdapterPosition();
             String key=getKeyInHashMap(hashMap,wrapperPosition);
             BLEdevice value=getValueInHashMap(hashMap,wrapperPosition);
-            mButtonClickHandler.onButtonClick(key,value);
+            mButtonClickHandler.onButtonClick(key,value.getRSSI(),value.getContent());
+
         }
         public TextView  getDevicemac() {
             return deviceNameView;
@@ -128,6 +136,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         public Button getBtn_detail() {
             return DataButton ;
+        }
+
+        public TextView getDeviceContent() {
+            return contentView;
         }
     }
 

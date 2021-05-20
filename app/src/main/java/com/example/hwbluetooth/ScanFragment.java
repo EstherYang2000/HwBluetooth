@@ -49,23 +49,22 @@ public class ScanFragment extends Fragment implements RecyclerAdapter.onButtonCl
     private boolean isScanning=false;
     private View view;
 
-    final String permissions[] = {
-            Manifest.permission.BLUETOOTH,
-            Manifest.permission.BLUETOOTH_ADMIN,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-    };
 
+
+    //--------------------------------------------------------------------------------------------------------------------------------------//
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+    //VIEW 初始化
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_scan, container, false);
 
-        // Initialize View
         buttonSCAN = view.findViewById(R.id.buttonSCAN);
         mRecyclerView = view.findViewById(R.id.bthdata);
-
-        // Initialize RecyclerView
         mResultAdapter = new RecyclerAdapter(BluetoothHashMap, this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
@@ -73,24 +72,29 @@ public class ScanFragment extends Fragment implements RecyclerAdapter.onButtonCl
 
         return view;
     }
+    //-----------------------------------------------------------------------------------------------
 
 
+    final String permissionscode[] = {
+            Manifest.permission.BLUETOOTH,
+            Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+    };
     @Override
     public void onViewCreated(@NonNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        boolean isGranted = isGranted(getActivity(), permissions);
+        boolean isaccpted = isaccpted(getActivity(), permissionscode);
 
-        if (!isGranted) {
-            // Access Permissions Dynamically
-            ActivityCompat.requestPermissions(getActivity(), permissions, 1);
+        if (!isaccpted) {
+            ActivityCompat.requestPermissions(getActivity(), permissionscode, 1);
         }
 
 
         // Initialize Bluetooth Adapter
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        // If Bluetooth not open or not enabled, request bluetooth action
+//判斷啟動BLUETOOTHSCANNER
         if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
             Intent enableBluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivity(enableBluetoothIntent);
@@ -101,7 +105,7 @@ public class ScanFragment extends Fragment implements RecyclerAdapter.onButtonCl
         }
 
 
-        // Start or Stop Scanning
+///點擊啟動SCAN
         buttonSCAN.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -115,7 +119,7 @@ public class ScanFragment extends Fragment implements RecyclerAdapter.onButtonCl
             }
         });
     }
-
+//---------------------------------------------------------------------------------------------------------------------------//
     @Override
     public void onPause() {
         super.onPause();
@@ -128,6 +132,8 @@ public class ScanFragment extends Fragment implements RecyclerAdapter.onButtonCl
         stopScan();
     }
 
+//---------------------------------------------------------------------------------------------------------------------------
+//回傳SCAN資撩
     private final ScanCallback startScanCallback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
@@ -137,38 +143,17 @@ public class ScanFragment extends Fragment implements RecyclerAdapter.onButtonCl
             byte[] content = mScanRecord.getBytes();
             int mRssi = result.getRssi();
 
-            String contentMessage = convertContent(content);
-
-            // Use Hashmap to ensure mac address unique
-            BluetoothHashMap.put(address, new BLEdevice(contentMessage, String.valueOf(mRssi)));
-            // Update Adapter with notifyDataSetChanged()
+            String contentMessage = byteToString(content);
+            //利用HASHMAP加入資料
+            BluetoothHashMap.put(address, new BLEdevice(contentMessage,String.valueOf(mRssi)));
+            //Adapter改變值
             mResultAdapter.notifyDataSetChanged();
         }
     };
-
-    // Implementation of Interface OnButtonClickHandler.onButtonClick()
-
-
-    @Override
-    public void onButtonClick(String key, BLEdevice bluetoothLE) {
-
-        stopScan();
-
-        NavController navController = Navigation.findNavController(this.view);
-
-        // Implementation of Safe Arguments
-        ScanFragmentDirections.ActionScanFragmentToDataFragment action =
-                ScanFragmentDirections.actionScanFragmentToDataFragment("MAC: " + key
-                        , "RSSI: " + bluetoothLE.getRSSI()
-                        , bluetoothLE.getContent());
-
-        // Navigating to specific fragment
-        navController.navigate(action);
-    }
-
-    public boolean isGranted(Context context, String... permissions) {
+//判斷是否開啟權限
+ public boolean isaccpted(Context context, String... permissions) {
         if (context != null && permissions != null) {
-            for (String permission : permissions) {
+            for (String permission : permissionscode) {
                 if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
                     return false;
                 }
@@ -177,28 +162,42 @@ public class ScanFragment extends Fragment implements RecyclerAdapter.onButtonCl
 
         return true;
     }
-
+//start to scan
     public void startScan() {
         isScanning = true;
         Log.d("onClicked", "start to scan");
-        buttonSCAN.setText("Stop");
+        buttonSCAN.setText("SCANOFF");
         mBluetoothLeScanner.startScan(startScanCallback);
     }
-
+//stop scan
     public void stopScan() {
         isScanning = false;
         Log.d("onClicked", "stop to scan");
-        buttonSCAN.setText("Scan");
+        buttonSCAN.setText("SCANON");
         mBluetoothLeScanner.stopScan(startScanCallback);
     }
 
-    public String convertContent(byte[] content) {
-        String message = "";
-        for (byte b : content) {
-            message += String.format("%02x ", b);
+    public static String byteToString(byte[] b) {
+        int length = b.length;
+        String data = new String();
+        for (int i = 0; i < length; i++) {
+            data += Integer.toHexString((b[i] >> 4) & 0xf);
+            data += Integer.toHexString(b[i] & 0xf);
         }
-        return message;
+        return data;
     }
 
+//點擊data按鈕回傳到datalist
+    @Override
+    public void onButtonClick(String key, String rssi, String Content) {
+        stopScan();
 
+        NavController navController = Navigation.findNavController(this.view);
+
+        ScanFragmentDirections.ActionScanFragmentToDataFragment action =
+                ScanFragmentDirections.actionScanFragmentToDataFragment("MAC: " + key
+                        , "RSSI: " + rssi
+                        , Content);
+        navController.navigate(action);
+    }
 }
